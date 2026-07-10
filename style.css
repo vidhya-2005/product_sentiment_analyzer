@@ -1,0 +1,24 @@
+.chart-container { 
+    position: relative; 
+    height: 300px; 
+    width: 100%; 
+}
+
+.sentiment-badge {
+    display: inline-flex; 
+    align-items: center; 
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px; 
+    font-size: 0.875rem; 
+    font-weight: 500;
+}
+
+.review-card { 
+    transition: all 0.3s ease; 
+    border-left-width: 4px; 
+}
+
+.review-card:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Sentiment Analyzer | AI-Powered Review Analysis</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen bg-gray-50 font-sans flex flex-col">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">SentimentAnalyzer</h1>
+                        <p class="text-sm text-gray-600">AI-Powered Product Insights</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <section class="mb-12 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Analyze Product Reviews with <span class="text-primary">AI</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                Enter any product name or paste a URL to analyze customer sentiment.
+            </p>
+            
+            <div class="max-w-2xl mx-auto mb-12">
+                <div class="relative">
+                    <div class="flex items-center bg-white rounded-xl shadow-lg p-1">
+                        <input 
+                            type="text" 
+                            id="productSearch"
+                            placeholder="Enter product name or URL..." 
+                            class="flex-grow px-6 py-4 text-lg focus:outline-none rounded-xl"
+                        >
+                        <button 
+                            id="analyzeBtn"
+                            class="bg-primary hover:bg-secondary text-white font-semibold px-8 py-4 rounded-lg transition flex items-center"
+                        >
+                            <i class="fas fa-search mr-2"></i>Analyze
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loadingIndicator" class="hidden max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2" id="loadingText">Initializing AI models...</h3>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4 mb-2 overflow-hidden">
+                        <div id="progressBar" class="bg-primary h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500" id="progressSubtext">0% Complete</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="hidden animate-fade-in">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Analysis Results for: <span id="productTitle" class="text-primary"></span></h3>
+                <p class="text-gray-600">Based on <span id="reviewCount" class="font-semibold"></span> reviews scraped across e-commerce platforms.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Sentiment Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="sentimentPieChart"></canvas>
+                    </div>
+                    <div class="mt-6 grid grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <div class="sentiment-badge bg-positive/10 text-positive mx-auto mb-2"><i class="fas fa-smile mr-2"></i>Positive</div>
+                            <p class="text-2xl font-bold"><span id="posPercent"></span><span class="text-lg text-gray-600">%</span></p>
+                        </div>
+                        <div class="text-center">
+                            <div class="sentiment-badge bg-neutral/10 text-neutral mx-auto mb-2"><i class="fas fa-meh mr-2"></i>Neutral</div>
+                            <p class="text-2xl font-bold"><span id="neuPercent"></span><span class="text-lg text-gray-600">%</span></p>
+                        </div>
+                        <div class="text-center">
+                            <div class="sentiment-badge bg-negative/10 text-negative mx-auto mb-2"><i class="fas fa-frown mr-2"></i>Negative</div>
+                            <p class="text-2xl font-bold"><span id="negPercent"></span><span class="text-lg text-gray-600">%</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Sentiment Over Time (Past Month)</h4>
+                    <div class="chart-container">
+                        <canvas id="sentimentBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 space-y-4 md:space-y-0">
+                    <h4 class="text-lg font-semibold text-gray-900">Extracted AI Insights</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <span class="mr-2 text-gray-700 font-medium">Filter:</span>
+                            <select id="sentimentFilter" class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer">
+                                <option value="all">All Sentiments</option>
+                                <option value="positive">Positive Only</option>
+                                <option value="neutral">Neutral Only</option>
+                                <option value="negative">Negative Only</option>
+                            </select>
+                        </div>
+                        <button id="exportBtn" class="text-primary hover:text-secondary font-medium transition flex items-center bg-blue-50 px-3 py-2 rounded-lg">
+                            <i class="fas fa-download mr-2"></i>Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div id="reviewsContainer" class="space-y-6"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="container mx-auto px-4 py-8 flex flex-col justify-center items-center">
+            <p class="text-gray-500 text-sm">© 2026 SentimentAnalyzer AI.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
